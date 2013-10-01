@@ -213,7 +213,7 @@ class Response
   # @api public
   #
   def rack_array
-    [status.code, headers, body]
+    [status.code, headers, rack_body]
   end
   memoize :rack_array
 
@@ -294,6 +294,10 @@ private
   #
   def assert_valid
     fail InvalidError, "Not a valid response: #{inspect}" unless valid?
+  end
+
+  def rack_body
+    body.respond_to?(:each) ? body : Array(body)
   end
 end
 
