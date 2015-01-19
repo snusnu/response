@@ -16,6 +16,8 @@ class Response
 
   TEXT_PLAIN = 'text/plain; charset=UTF-8'.freeze
 
+  SET_COOKIE_HEADER = 'Set-Cookie'.freeze
+
   # Undefined response component
   #
   # A class to get nice #inspect behavior ootb
@@ -116,6 +118,36 @@ class Response
   #
   def with_headers(headers)
     self.class.new(status, headers, body)
+  end
+
+  # Return response with a new 'Set-Cookie' header
+  #
+  # @param [#to_s] header
+  #   An RFC6265 compliant Set-Cookie header
+  #
+  # @return [Response]
+  #   new response with headers set
+  #
+  # @example setting a new cookie
+  #
+  #   response = Response.new(200, {'Foo' => 'Baz'})
+  #   response = response.with_cookie('SID={"id": 11}; Domain=.foo.bar')
+  #   response.headers
+  #
+  #   # {
+  #   #   'Set-Cookie' => 'SID={"id": 11}; Domain=.foo.bar',
+  #   #   'Foo' => 'Baz'
+  #   # }
+  #
+  # @example deleting an existing cookie
+  #
+  #   response = Response.new(200, {})
+  #   header = 'SID=; Domain=.foo.bar; Expires=Thu, 01 Jan 1970 00:00:00 -0000'
+  #   response.with_cookie(header)
+  #
+  # @api public
+  def with_cookie(header)
+    merge_headers(SET_COOKIE_HEADER => header.to_s)
   end
 
   # Return response with merged headers
